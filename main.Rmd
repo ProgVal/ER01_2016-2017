@@ -12,7 +12,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Load data
 
-Structure: Each line is a ping sent to an Hyperboria node, using Debian's `ping`. Columns are:
+## Data structure
+
+Each line is a ping sent to an Hyperboria node, using Debian's `ping`.
+
+Columns are:
+
 * timestamp: timestamp the ping was sent, as reported by ping.
 * round_start_timestamp: timestamp the `ping` tool was invoked at.
 * node: IPv6 address of the pinged node.
@@ -26,3 +31,15 @@ data = read.csv("scan_data.csv.gz")
 head(data)
 summary(data)
 ```
+
+## Fixes
+
+Compensate offset bug of the ping collection script.
+
+```{r}
+lines_with_seq_offset = !is.na(data$latency)
+data$seq[lines_with_seq_offset] = data$seq[lines_with_seq_offset]-2
+summary(data$seq)
+```
+
+# Analysis
