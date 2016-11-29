@@ -1,0 +1,28 @@
+---
+title: "project_Hyperboria"
+author: "Rémy CERDA and Valentin Lorentz"
+date: "29 novembre 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Load data
+
+Structure: Each line is a ping sent to an Hyperboria node, using Debian's `ping`. Columns are:
+* timestamp: timestamp the ping was sent, as reported by ping.
+* round_start_timestamp: timestamp the `ping` tool was invoked at.
+* node: IPv6 address of the pinged node.
+* seq: sequence number, as reported by ping. There is a bug with my script: for nodes that can be pinged, the seq is from 2 to 4, and for nodes which could not be reach it is from 0 to 2. The former should be fixed before analysing data.
+* nb_bytes: number of bytes of the ICMP PING, as reported by ping
+* ttl: ICMP TTL, as reported by ping
+* latency: latency reported by ping.
+
+```{r}
+data = read.csv("scan_data.csv.gz")
+head(data)
+summary(data)
+```
