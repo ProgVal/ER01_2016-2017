@@ -36,3 +36,6 @@ vignettes/*.pdf
 *.html
 *.pdf
 core
+
+# Huge input data
+scan_data_fixed.csv.gz
