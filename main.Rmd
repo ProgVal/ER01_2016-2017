@@ -87,6 +87,5 @@ sample_data = data[sample(nrow(data), 1000),]
 ```{r}
 summary(sample_data$latency)
 hist(c(sample_data$latency))
-#ggplot(data=sample_data) + aes(x=latency) + geom_histogram(stat="count")
-#ggplot(data=c(sample_data$latency)) + geom_histogram(stat="count")
+ggplot(data=sample_data) + aes(x=latency) + geom_histogram()
 ```
