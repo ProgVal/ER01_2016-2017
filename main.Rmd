@@ -69,7 +69,8 @@ summary(data$seq)
 
 First, let us have a look to the repartition of latency:
 ```{r}
-hist(c(data$latency))
+summary(data$latency)
+ggplot(data=data, aes(x=latency)) + xlim(0, 2000) + geom_histogram(binwidth=100);
 ```
 
 ## Sample data
@@ -78,15 +79,4 @@ Take a sample for faster tests
 
 ```{r}
 sample_data = data[sample(nrow(data), 1000),]
-```
-
-# Analysis
-
-## Plots of the latency
-
-```{r}
-summary(sample_data$latency)
-hist(c(sample_data$latency))
-#ggplot(data=sample_data) + aes(x=latency) + geom_histogram(stat="count")
-#ggplot(data=c(sample_data$latency)) + geom_histogram(stat="count")
 ```
