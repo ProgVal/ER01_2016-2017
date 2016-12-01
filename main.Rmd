@@ -55,9 +55,9 @@ Columns are:
 * latency: latency reported by ping.
 
 ```{r}
-data = read.csv("scan_data_fixed.csv.gz")
-head(data)
-summary(data)
+pings = read.csv("scan_data_fixed.csv.gz")
+head(pings)
+summary(pings)
 ```
 
 ## Fixes
@@ -72,12 +72,32 @@ summary(data$seq)
 
 ## Distances database
 
-```
+Load the database
+
+```{r}
 distances = read.csv("node_distances.csv")
 ```
 
+Add distance column to the ping data:
+
+```{r}
+data = merge(data, distances, by="node", all.x=TRUE)
+head(data)
+summary(data)
+```
+
+
+# Sample data
+
+Take a sample for faster tests
+
+```{r}
+sample_data = data[sample(nrow(data), 1000),]
+```
 
 # Analysis
+
+## Latency distribution
 
 First, let us have a look to the repartition of latency:
 ```{r}
@@ -85,10 +105,12 @@ summary(data$latency)
 ggplot(data=data, aes(x=latency)) + xlim(0, 2000) + geom_histogram(binwidth=100);
 ```
 
-## Sample data
-
-Take a sample for faster tests
+## Latency and distance
 
 ```{r}
-sample_data = data[sample(nrow(data), 1000),]
+ggplot(data=data, aes(x=distance, y=latency)) + ylim(0, 2000) + geom_point();
+```
+
+```{r}
+ggplot(data=data, aes(x=latency)) + xlim(0, 2000) + geom_histogram(binwidth=50) + facet_grid(distance ~ .);
 ```
