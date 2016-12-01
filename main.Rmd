@@ -12,6 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Load data
 
+```{r, include=FALSE}
+library(ggplot2)
+```
+
 ## Data structure
 
 Each line is a ping sent to an Hyperboria node, using Debian's `ping`.
@@ -43,3 +47,8 @@ summary(data$seq)
 ```
 
 # Analysis
+
+First, let us have a look to the repartition of latency:
+```{r}
+hist(c(data$latency))
+```
