@@ -70,6 +70,13 @@ data$seq[lines_with_seq_offset] = data$seq[lines_with_seq_offset]-2
 summary(data$seq)
 ```
 
+## Distances database
+
+```
+distances = read.csv("node_distances.csv")
+```
+
+
 # Analysis
 
 First, let us have a look to the repartition of latency:
