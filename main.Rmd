@@ -9,6 +9,25 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library("ggplot2")
+```
+
+# Produce data
+
+On a computer connected to Hyperboria, create the file “scan_data.csv” with this content:
+
+```
+timestamp,round_start_timestamp,node,seq,nb_bytes,ttl,latency
+```
+
+Then, run:
+
+* `python3 ping_scan.py` wait for the results, press Ctl-C
+* `gzip scan_data.csv` (the result is in this git repo)
+* `cat scan_data.csv.gz | gunzip | sed "s/ ms//" | gzip > scan_data_fixed.csv.gz`
+
+
 
 # Load data
 
@@ -31,7 +50,7 @@ Columns are:
 * latency: latency reported by ping.
 
 ```{r}
-data = read.csv("scan_data.csv.gz")
+data = read.csv("scan_data_fixed.csv.gz")
 head(data)
 summary(data)
 ```
@@ -51,4 +70,23 @@ summary(data$seq)
 First, let us have a look to the repartition of latency:
 ```{r}
 hist(c(data$latency))
+```
+
+## Sample data
+
+Take a sample for faster tests
+
+```{r}
+sample_data = data[sample(nrow(data), 1000),]
+```
+
+# Analysis
+
+## Plots of the latency
+
+```{r}
+summary(sample_data$latency)
+hist(c(sample_data$latency))
+#ggplot(data=sample_data) + aes(x=latency) + geom_histogram(stat="count")
+#ggplot(data=c(sample_data$latency)) + geom_histogram(stat="count")
 ```
