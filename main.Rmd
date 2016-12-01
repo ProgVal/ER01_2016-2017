@@ -9,8 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include=FALSE}
 library("ggplot2")
+library("dplyr")
 ```
 
 # Produce data
@@ -35,10 +36,6 @@ And:
 
 
 # Load data
-
-```{r, include=FALSE}
-library(ggplot2)
-```
 
 ## Data structure
 
@@ -65,9 +62,9 @@ summary(pings)
 Compensate offset bug of the ping collection script.
 
 ```{r}
-lines_with_seq_offset = !is.na(data$latency)
-data$seq[lines_with_seq_offset] = data$seq[lines_with_seq_offset]-2
-summary(data$seq)
+lines_with_seq_offset = !is.na(pings$latency)
+pings$seq[lines_with_seq_offset] = pings$seq[lines_with_seq_offset]-2
+summary(pings$seq)
 ```
 
 ## Distances database
@@ -81,7 +78,7 @@ distances = read.csv("node_distances.csv")
 Add distance column to the ping data:
 
 ```{r}
-data = merge(data, distances, by="node", all.x=TRUE)
+data = merge(pings, distances, by="node", all.x=TRUE)
 head(data)
 summary(data)
 ```
@@ -92,7 +89,7 @@ summary(data)
 Take a sample for faster tests
 
 ```{r}
-sample_data = data[sample(nrow(data), 1000),]
+sampled_data = data[sample(nrow(data), 10000),]
 ```
 
 # Analysis
