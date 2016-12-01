@@ -120,17 +120,13 @@ ggplot(data=data, aes(x=distance, y=latency)) + geom_boxplot();
 ```{r}
 # too slow
 # aggregated_data = aggregate(data, by=list(data$round_start_timestamp, data$node), FUN=mean)
-aggregated_data = data[sampled_data$seq == 2,]
+aggregated_data = data %>% filter(seq == 2) %>% filter(!is.na(latency)) %>% as.data.frame();
 summary(aggregated_data$latency)
-#df_lag = data.frame(old=c(data$latency)[1:length(c(data$latency))-1], new=c(data$latency)[2:length(c(data$latency))])
 
-#library(data.table)
-#df_lags = aggregated_data[, lag.latency:=c(NA, latency[-.N]), by=node]
-
-#df_grouped = group_by(aggregated_data, node)
-df_lag = aggregated_data %>% group_by(node) %>% mutate(latency_change=df_grouped$latency - dplyr::lag(df_grouped$latency))
-#df_lag = aggregated_data %>% group_by(node) %>% mutate(latency_change=df_grouped$latency[1:length(df_grouped$latency)-1] - df_grouped$latency[2:df_grouped$latency])
+head(aggregated_data)
+df_lag = aggregated_data %>% group_by(node) %>% mutate(old_latency=dplyr::lag(latency)) %>% mutate(latency_change=latency - old_latency) %>% mutate(relative_latency_change=2*latency_change/(old_latency+latency)) %>% as.data.frame()
 head(df_lag)
-summary(df_lag$old - df_lag$new)
-ggplot(data=df_lag, aes(x=old, y=new)) + geom_point()
+ggplot(data=df_lag, aes(x=old_latency, y=latency)) + geom_point()
+ggplot(data=df_lag, aes(x=latency_change)) + geom_histogram()
+ggplot(data=df_lag, aes(x=relative_latency_change)) + xlim(-2,2) + geom_histogram(bins=100)
 ```
