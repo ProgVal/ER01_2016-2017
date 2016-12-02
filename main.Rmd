@@ -17,7 +17,7 @@ library("dplyr")
 # Introduction
 
 This project is about analysing latency and reachability on a mesh network, sometimes using a partial knowledge of its topology.
-We collected data on the Hyperboria network, which is a mesh network deployed both at local (over Ethernet) and global (over UDP) levels.
+We collected data on the Hyperboria network, which is a mesh network deployed both at local (over Ethernet) and global (over UDP) levels, with about a thousand nodes.
 Hyperboria has the advantage of making its list of nodes easily discoverable (it uses source routing), so we can get a list of most of the nodes of the network easily.
 
 The database of pings it created by running 3 pings to each node, every 10 minutes, and storing the latency. The system running the script is hydrogen.hype.progval.net (fcd6:9c33:dd06:3320:8dbe:ab19:c87:f6e3).
