@@ -14,9 +14,17 @@ library("ggplot2")
 library("dplyr")
 ```
 
-# Produce data
+# Introduction
 
-On a computer connected to Hyperboria, create the file “scan_data.csv” with this content:
+This project is about analysing latency and reachability on a mesh network, sometimes using a partial knowledge of its topology.
+We collected data on the Hyperboria network, which is a mesh network deployed both at local (over Ethernet) and global (over UDP) levels.
+Hyperboria has the advantage of making its list of nodes easily discoverable (it uses source routing), so we can get a list of most of the nodes of the network easily.
+
+The database of pings it created by running 3 pings to each node, every 10 minutes, and storing the latency.
+
+# Producing data
+
+On a computer connected to Hyperboria (and with `fc00::/8` routed to it), create the file “scan_data.csv” with this content:
 
 ```
 timestamp,round_start_timestamp,node,seq,nb_bytes,ttl,latency
@@ -69,7 +77,9 @@ summary(pings$seq)
 
 ## Distances database
 
-Load the database
+The distance database is computed from the graph hosted at fc00.org. This graph is obtained from various probes on the network submitting their view of the network to fc00.org, which aggregates results.
+
+Load the database:
 
 ```{r}
 distances = read.csv("node_distances.csv")
@@ -81,15 +91,6 @@ Add distance column to the ping data:
 data = merge(pings, distances, by="node", all.x=TRUE)
 head(data)
 summary(data)
-```
-
-
-# Sample data
-
-Take a sample for faster tests
-
-```{r}
-sampled_data = data[sample(nrow(data), 10000),]
 ```
 
 # Analysis
@@ -118,33 +119,67 @@ And for readability, a log-scaled version:
 ```{r}
 ggplot(data=data, aes(x=factor(distance), y=latency)) + geom_boxplot() + scale_y_log10();
 ```
+
 ## Lag graph of latency
 
+First, compute the difference of latency for each node, between sequences of 3 pings:
+
 ```{r}
-# too slow
-# aggregated_data = aggregate(data, by=list(data$round_start_timestamp, data$node), FUN=mean)
-aggregated_data = data %>% filter(seq == 2) %>% filter(!is.na(latency)) %>% as.data.frame();
+aggregated_data = data %>% group_by(round_start_timestamp, node) %>% summarize(latency=mean(latency), distance=min(distance)) %>% filter(!is.na(latency)) %>% as.data.frame();
 summary(aggregated_data$latency)
 
 head(aggregated_data)
 df_lag = aggregated_data %>% group_by(node) %>% mutate(old_latency=dplyr::lag(latency)) %>% mutate(latency_change=latency - old_latency) %>% mutate(relative_latency_change=latency_change/(old_latency+latency)) %>% as.data.frame()
 head(df_lag)
-ggplot(data=df_lag, aes(x=old_latency, y=latency)) + xlim(0, 2500) + ylim(0, 2500) + geom_point()
-ggplot(data=df_lag, aes(x=latency_change)) + xlim(-1000, 1000) + geom_histogram(bins=100)
-ggplot(data=df_lag, aes(x=relative_latency_change)) + geom_histogram(bins=100)
-ggplot(data=df_lag, aes(x=latency, y=relative_latency_change)) + geom_point()
-summary(df_lag$relative_latency_change)
+```
 
+```{r}
+#ggplot(data=df_lag, aes(x=old_latency, y=latency)) + xlim(0, 2500) + ylim(0, 2500) + geom_point()
+```
+
+We can observe the distribution of latency changes:
+
+```{r}
+ggplot(data=df_lag, aes(x=latency_change)) + xlim(-1000, 1000) + geom_histogram(bins=100)
+summary(df_lag$latency_change);
+```
+
+Scaled to the latency of each node:
+
+```{r}
+ggplot(data=df_lag, aes(x=relative_latency_change)) + geom_histogram(bins=100)
+#ggplot(data=df_lag, aes(x=latency, y=relative_latency_change)) + geom_point()
+summary(df_lag$relative_latency_change)
+```
+
+Finally, we can split this distribution over the different distances, which all seem to have a similar distribution:
+
+```{r}
 ggplot(data=df_lag, aes(x=relative_latency_change)) + xlim(-2,2) + geom_histogram(bins=50) + facet_grid(distance ~ ., scale="free_y");
 ```
 
 
 ## Distribution of number of replies to ping from a node
 
+Here, we are not interested in the latency, but whether or not a node replies.
+
+First, compute the number of rounds in which each node responded (to the third ping), discarding nodes which never replies:
+
 ```{r}
-df_counts = data %>% filter(seq == 2) %>% filter(!is.na(latency)) %>% group_by(node) %>% summarize(nb_replies=n(), distance=mean(distance, na.rm=TRUE)) %>% as.data.frame();
+df_counts = data %>% filter(seq == 2) %>% filter(!is.na(latency)) %>% group_by(node) %>% summarize(nb_replies=n(), distance=mean(distance)) %>% as.data.frame();
 summary(df_counts)
 head(df_counts)
+```
+
+Although we cannot see any apparent pattern on global statistics...
+
+```{r}
 ggplot(data=df_counts, aes(x=nb_replies/max(nb_replies))) + geom_histogram(bins=50);
-ggplot(data=df_counts, aes(x=distance, y=nb_replies/max(nb_replies))) + geom_point();
+```
+
+... we can see a mostly-linear decrease of the ratio replies when the distance increases.
+Note that NA is for nodes which are not on the graph of fc00 -- usually because none of the probes know where on the graph they are, which is either caused by them being far for the probe / hard to reach / not very reliable.
+
+```{r}
+ggplot(data=df_counts, aes(x=factor(distance), y=nb_replies/max(nb_replies))) + geom_boxplot();
 ```
