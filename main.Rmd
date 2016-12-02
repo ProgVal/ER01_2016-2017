@@ -104,17 +104,20 @@ ggplot(data=data, aes(x=latency)) + xlim(0, 2000) + geom_histogram(binwidth=100)
 
 ## Latency and distance
 
-```{r}
-ggplot(data=data, aes(x=distance, y=latency)) + ylim(0, 2000) + geom_point();
-```
-
+Let us draw histograms of latency for each distance:
 ```{r}
 ggplot(data=data, aes(x=latency)) + xlim(0, 2000) + geom_histogram(binwidth=50) + facet_grid(distance ~ .);
 ```
+
+The graph is not really readable. Further analysis can be led using following boxplots:
 ```{r}
-ggplot(data=data, aes(x=distance, y=latency)) + geom_boxplot();
+ggplot(data=data, aes(x=factor(distance), y=latency)) + geom_boxplot();
 ```
 
+And for readability, a log-scaled version:
+```{r}
+ggplot(data=data, aes(x=factor(distance), y=latency)) + geom_boxplot() + scale_y_log10();
+```
 ## Lag graph of latency
 
 ```{r}
