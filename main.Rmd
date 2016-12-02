@@ -130,4 +130,7 @@ ggplot(data=df_lag, aes(x=old_latency, y=latency)) + xlim(0, 2500) + ylim(0, 250
 ggplot(data=df_lag, aes(x=latency_change)) + xlim(-1000, 1000) + geom_histogram(bins=100)
 ggplot(data=df_lag, aes(x=relative_latency_change)) + xlim(-2,2) + geom_histogram(bins=100)
 ggplot(data=df_lag, aes(x=latency, y=relative_latency_change)) + geom_point(bins=100)
+
+
+ggplot(data=df_lag, aes(x=relative_latency_change)) + xlim(-2,2) + geom_histogram(bins=50) + facet_grid(distance ~ ., scale="free_y");
 ```
