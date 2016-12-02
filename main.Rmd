@@ -137,3 +137,14 @@ summary(df_lag$relative_latency_change)
 
 ggplot(data=df_lag, aes(x=relative_latency_change)) + xlim(-2,2) + geom_histogram(bins=50) + facet_grid(distance ~ ., scale="free_y");
 ```
+
+
+## Distribution of number of replies to ping from a node
+
+```{r}
+df_counts = data %>% filter(seq == 2) %>% filter(!is.na(latency)) %>% group_by(node) %>% summarize(nb_replies=n(), distance=mean(distance, na.rm=TRUE)) %>% as.data.frame();
+summary(df_counts)
+head(df_counts)
+ggplot(data=df_counts, aes(x=nb_replies/max(nb_replies))) + geom_histogram(bins=50);
+ggplot(data=df_counts, aes(x=distance, y=nb_replies/max(nb_replies))) + geom_point();
+```
