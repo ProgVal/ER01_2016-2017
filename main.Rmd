@@ -180,6 +180,8 @@ ggplot(data=df_counts, aes(x=nb_replies/max(nb_replies))) + geom_histogram(bins=
 ... we can see a mostly-linear decrease of the ratio replies when the distance increases.
 Note that NA is for nodes which are not on the graph of fc00 -- usually because none of the probes know where on the graph they are, which is either caused by them being far for the probe / hard to reach / not very reliable.
 
+We can also note that nodes at distance 1 are highly reliable -- a potential bias to this is that they are direct peers of the source node (Hydrogen), which I chose myself for their reliability. Nodes at distance >= are more evenly distributed, because Hydrogen's peers are far more open on their peering policy.
+
 ```{r}
 ggplot(data=df_counts, aes(x=factor(distance), y=nb_replies/max(nb_replies))) + geom_boxplot();
 ```
