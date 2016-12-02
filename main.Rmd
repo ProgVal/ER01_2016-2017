@@ -1,6 +1,6 @@
 ---
 title: "project_Hyperboria"
-author: "Rémy CERDA and Valentin Lorentz"
+author: "Rémy Cerda and Valentin Lorentz"
 date: "29 novembre 2016"
 output: html_document
 ---
