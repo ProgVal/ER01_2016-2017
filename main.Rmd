@@ -111,3 +111,6 @@ ggplot(data=data, aes(x=distance, y=latency)) + ylim(0, 2000) + geom_point();
 ```{r}
 ggplot(data=data, aes(x=latency)) + xlim(0, 2000) + geom_histogram(binwidth=50) + facet_grid(distance ~ .);
 ```
+```{r}
+ggplot(data=data, aes(x=distance, y=latency)) + geom_boxplot();
+```
