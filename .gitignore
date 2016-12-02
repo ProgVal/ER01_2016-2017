@@ -40,4 +40,4 @@ core
 # Huge input data
 scan_data_fixed.csv.gz
 node_distances.csv
-
+main_files/*
